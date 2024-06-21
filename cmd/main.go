@@ -4,5 +4,5 @@ import "github.com/sudo-odner/CurrencyConverter/internal/controler/protHttp"
 
 func main() {
 	newClient := protHttp.New()
-	newClient.GetAllFiat()
+	newClient.GetAllCryptocurrencies()
 }
