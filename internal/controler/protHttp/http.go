@@ -2,20 +2,24 @@ package protHttp
 
 import (
 	"github.com/sudo-odner/CurrencyConverter/internal/controler/protHttp/middleware"
+	"github.com/sudo-odner/CurrencyConverter/internal/entity"
 	"net/http"
 )
 
-type IClient interface {
-	GetAllCryptocurrencies() DataCryptocurrencies
-	GetAllFiat() DataFiat
-	ConvertOneToOne(amount, from, to float64) ConvertOneToOneRes
+type IHttpClient interface {
+	GetAllCryptocurrencies() entity.DataCryptocurrencies
+	GetAllFiat() entity.DataFiat
+	ConvertOneToOne(amount, from, to float64) entity.ConvertOneToOneRes
 }
 
-type Client struct {
-	client http.Client
+type HttpClient struct {
+	client                 http.Client
+	urlGetFiat             string
+	urlGetCryptocurrencies string
+	urlConvertOneToOne     string
 }
 
-func New() IClient {
+func New(urlGetFiat, urlGetCryptocurrencies, urlConvertOneToOne string) IHttpClient {
 	stackMiddleware := middleware.CreateStack(
 		middleware.SecretKey,
 		middleware.ResponseStatus,
@@ -24,7 +28,10 @@ func New() IClient {
 		Transport: stackMiddleware(http.DefaultTransport),
 	}
 
-	return &Client{
-		client: newHttpClient,
+	return &HttpClient{
+		client:                 newHttpClient,
+		urlGetFiat:             urlGetFiat,
+		urlGetCryptocurrencies: urlGetCryptocurrencies,
+		urlConvertOneToOne:     urlConvertOneToOne,
 	}
 }

@@ -1,4 +1,6 @@
-package model
+package entity
+
+// Database
 
 type DataCryptocurrenciesAndFiat struct {
 	Data []Item `json:"data"`

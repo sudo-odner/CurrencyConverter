@@ -9,7 +9,14 @@ import (
 )
 
 type Config struct {
-	Api_key                  string `yaml:"API_KEY"`
+	ProtHttp ProtHttp `yaml:"protocol_http"`
+}
+
+type ProtHttp struct {
+	Url Url `yaml:"url"`
+}
+
+type Url struct {
 	Url_get_fiat             string `yaml:"url_get_fiat"`
 	Url_get_cryptocurrencies string `yaml:"url_get_cryptocurrencies"`
 	Url_convert_one_to_one   string `yaml:"url_convert_one_to_one"`

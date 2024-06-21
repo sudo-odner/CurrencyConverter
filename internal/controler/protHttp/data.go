@@ -3,30 +3,10 @@ package protHttp
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/sudo-odner/CurrencyConverter/internal/entity"
 	"io"
 	"net/http"
 )
-
-type DataFiat struct {
-	Data []itemRequest `json:"data"`
-}
-
-type DataCryptocurrencies struct {
-	Data []itemRequest `json:"data"`
-}
-
-type itemRequest struct {
-	ID     float64 `json:"id"`
-	Name   string  `json:"name"`
-	Symbol string  `json:"symbol"`
-}
-
-type ConvertOneToOneRes struct {
-	FromID     float64 `json:"from_id"`
-	FromAmount float64 `json:"from_amount"`
-	ToID       float64 `json:"to_id"`
-	ToAmount   float64 `json:"to_amount"`
-}
 
 // Декодирование Body в map[string]interface{} формат
 func convert(body io.ReadCloser) (map[string]interface{}, error) {
@@ -43,16 +23,16 @@ func convert(body io.ReadCloser) (map[string]interface{}, error) {
 	return bodyMap, nil
 }
 
-func (c Client) GetAllFiat() DataFiat {
-	url := "https://pro-api.coinmarketcap.com/v1/fiat/map"
+func (c *HttpClient) GetAllFiat() entity.DataFiat {
+	url := c.urlGetFiat
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Accepts", "application/json")
 
 	resp, err := c.client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return DataFiat{
-			Data: make([]itemRequest, 0),
+		return entity.DataFiat{
+			Data: make([]entity.ItemRequest, 0),
 		}
 	}
 	defer resp.Body.Close()
@@ -60,37 +40,37 @@ func (c Client) GetAllFiat() DataFiat {
 	bodyMap, err := convert(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return DataFiat{
-			Data: make([]itemRequest, 0),
+		return entity.DataFiat{
+			Data: make([]entity.ItemRequest, 0),
 		}
 	}
 
 	dataMap := bodyMap["data"].([]interface{})
 
-	data := make([]itemRequest, 0, len(dataMap))
+	data := make([]entity.ItemRequest, 0, len(dataMap))
 	for _, item := range dataMap {
-		var itemStruct itemRequest
+		var itemStruct entity.ItemRequest
 		itemStruct.ID = item.(map[string]any)["id"].(float64)
 		itemStruct.Name = item.(map[string]any)["name"].(string)
 		itemStruct.Symbol = item.(map[string]any)["symbol"].(string)
 		data = append(data, itemStruct)
 	}
 
-	return DataFiat{
+	return entity.DataFiat{
 		Data: data,
 	}
 }
 
-func (c Client) GetAllCryptocurrencies() DataCryptocurrencies {
-	url := "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
+func (c *HttpClient) GetAllCryptocurrencies() entity.DataCryptocurrencies {
+	url := c.urlGetCryptocurrencies
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Accepts", "application/json")
 
 	resp, err := c.client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return DataCryptocurrencies{
-			Data: make([]itemRequest, 0),
+		return entity.DataCryptocurrencies{
+			Data: make([]entity.ItemRequest, 0),
 		}
 	}
 	defer resp.Body.Close()
@@ -99,35 +79,35 @@ func (c Client) GetAllCryptocurrencies() DataCryptocurrencies {
 	bodyMap, err := convert(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return DataCryptocurrencies{
-			Data: make([]itemRequest, 0),
+		return entity.DataCryptocurrencies{
+			Data: make([]entity.ItemRequest, 0),
 		}
 	}
 
 	dataMap := bodyMap["data"].([]interface{})
 
-	data := make([]itemRequest, 0, len(dataMap))
+	data := make([]entity.ItemRequest, 0, len(dataMap))
 	for _, item := range dataMap {
-		var itemStruct itemRequest
+		var itemStruct entity.ItemRequest
 		itemStruct.ID = item.(map[string]any)["id"].(float64)
 		itemStruct.Name = item.(map[string]any)["name"].(string)
 		itemStruct.Symbol = item.(map[string]any)["symbol"].(string)
 		data = append(data, itemStruct)
 	}
-	return DataCryptocurrencies{
+	return entity.DataCryptocurrencies{
 		Data: data,
 	}
 }
 
-func (c Client) ConvertOneToOne(amount, from, to float64) ConvertOneToOneRes {
-	url := fmt.Sprintf("https://pro-api.coinmarketcap.com/v2/tools/price-conversion?amount=%.2f&id=%.0f&convert_id=%.0f", amount, from, to)
+func (c *HttpClient) ConvertOneToOne(amount, from, to float64) entity.ConvertOneToOneRes {
+	url := fmt.Sprintf(c.urlConvertOneToOne+"?amount=%.2f&id=%.0f&convert_id=%.0f", amount, from, to)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Accepts", "application/json")
 
 	resp, err := c.client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return ConvertOneToOneRes{}
+		return entity.ConvertOneToOneRes{}
 	}
 	defer resp.Body.Close()
 
@@ -135,16 +115,16 @@ func (c Client) ConvertOneToOne(amount, from, to float64) ConvertOneToOneRes {
 	bodyMap, err := convert(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return ConvertOneToOneRes{}
+		return entity.ConvertOneToOneRes{}
 	}
 
 	dataMap := bodyMap["data"].(map[string]interface{})
-	fmt.Println(dataMap)
 
-	return ConvertOneToOneRes{
+	strTo := fmt.Sprintf("%.0f", to)
+	return entity.ConvertOneToOneRes{
 		FromID:     from,
 		FromAmount: dataMap["amount"].(float64),
 		ToID:       to,
-		ToAmount:   dataMap["quote"].(map[string]interface{})["2781"].(map[string]interface{})["price"].(float64),
+		ToAmount:   dataMap["quote"].(map[string]interface{})[strTo].(map[string]interface{})["price"].(float64),
 	}
 }

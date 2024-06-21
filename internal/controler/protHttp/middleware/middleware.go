@@ -3,7 +3,9 @@ package middleware
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 )
 
 // В стандартной библиотеке не нашел типа который бы имел такую реализацию поэтому создал сам
@@ -28,9 +30,14 @@ func CreateStack(xs ...Middleware) Middleware {
 
 func SecretKey(next http.RoundTripper) http.RoundTripper {
 	return nextRoundTripper(func(req *http.Request) (*http.Response, error) {
-		// TODO Убрать от сюда ключ
 		// Подвязка ключа в Header
-		req.Header.Add("X-CMC_PRO_API_KEY", "320c56fe-4b4a-4b03-8481-87620269aebb")
+		key, exists := os.LookupEnv("API_KEY")
+		if !exists {
+			log.Fatal("API_KEY is not found")
+			return nil, errors.New("API_KEY is not found")
+		}
+
+		req.Header.Add("X-CMC_PRO_API_KEY", key)
 
 		res, e := next.RoundTrip(req)
 		return res, e

@@ -3,11 +3,23 @@ package terminal
 import (
 	"bufio"
 	"fmt"
+	"github.com/sudo-odner/CurrencyConverter/internal/usecase"
 	"os"
+	"strconv"
 	"strings"
 )
 
-func Start() {
+type Terminal struct {
+	us usecase.UseCase
+}
+
+func New(us usecase.UseCase) Terminal {
+	return Terminal{
+		us: us,
+	}
+}
+
+func (t *Terminal) Start() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Mega currency converter")
 	fmt.Println("For currency write: <amount> <from symbol> <symbol>")
@@ -28,9 +40,12 @@ func Start() {
 		}
 		data := strings.Split(text, " ")
 		if len(data) == 3 {
-			fmt.Println(data[0])
-			fmt.Println(data[1])
-			fmt.Println(data[2])
+			fl, err := strconv.ParseFloat(data[0], 64)
+			if err != nil {
+				fmt.Println("amount - is not float")
+			} else {
+				fmt.Println(t.us.ConvertOneToOne(fl, data[1], data[2]))
+			}
 		} else {
 			fmt.Println("Use example: <amount> <from symbol> <symbol>")
 		}

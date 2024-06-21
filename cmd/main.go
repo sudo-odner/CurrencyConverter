@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"github.com/sudo-odner/CurrencyConverter/internal/controler/protHttp"
+	"github.com/sudo-odner/CurrencyConverter/internal/app"
 )
 
 func main() {
-	newClient := protHttp.New()
-	fmt.Println(newClient.ConvertOneToOne(31, 1, 2781))
+	app.Start()
 }
