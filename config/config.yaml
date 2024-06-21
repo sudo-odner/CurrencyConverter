@@ -1,0 +1,4 @@
+API_KEY: "320c56fe-4b4a-4b03-8481-87620269aebb"
+url_get_fiat: "https://pro-api.coinmarketcap.com/v1/fiat/map"
+url_get_cryptocurrencies: "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
+url_convert_one_to_one: "https://pro-api.coinmarketcap.com/v2/tools/price-conversion"
