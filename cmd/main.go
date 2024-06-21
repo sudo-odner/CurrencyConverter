@@ -1,8 +1,11 @@
 package main
 
-import "github.com/sudo-odner/CurrencyConverter/internal/controler/protHttp"
+import (
+	"fmt"
+	"github.com/sudo-odner/CurrencyConverter/internal/controler/protHttp"
+)
 
 func main() {
 	newClient := protHttp.New()
-	newClient.GetAllCryptocurrencies()
+	fmt.Println(newClient.ConvertOneToOne(31, 1, 2781))
 }

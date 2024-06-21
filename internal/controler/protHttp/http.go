@@ -8,7 +8,7 @@ import (
 type IClient interface {
 	GetAllCryptocurrencies() DataCryptocurrencies
 	GetAllFiat() DataFiat
-	ConvertOneToOne()
+	ConvertOneToOne(amount, from, to float64) ConvertOneToOneRes
 }
 
 type Client struct {
