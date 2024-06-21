@@ -6,8 +6,8 @@ import (
 )
 
 type IClient interface {
-	GetAllCoin()
-	GetAllFiat()
+	GetAllCryptocurrencies() DataCryptocurrencies
+	GetAllFiat() DataFiat
 	ConvertOneToOne()
 }
 
